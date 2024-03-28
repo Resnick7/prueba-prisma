@@ -1,41 +1,40 @@
+import globalStyles from '~/styles/global.css'
+
 import type { MetaFunction } from "@remix-run/node";
+import { useLoaderData, Link } from '@remix-run/react';
+
+import  prisma from '~/lib/db.server'
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
+    { title: "Prisma App" },
     { name: "description", content: "Welcome to Remix!" },
   ];
 };
 
+export const loader = async () => {
+  const data = {
+    teams: await prisma.team.findMany(),
+  }
+  return data
+}
+
 export default function Index() {
+  const { teams } = useLoaderData()
+
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
+    <>
+      <div>
+        <h1>Soccer Teams around the world</h1>
+      </div>
       <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
+        {teams.map((team) => (
+          <li key={team.id}>
+            <h1>{team.team}</h1>
+            <p>{team.country}</p>
+          </li>
+        ))}
       </ul>
-    </div>
-  );
+    </>
+  )
 }
